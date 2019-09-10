@@ -2,9 +2,13 @@
 This project contains implementations of gradient noise algorithms such as Perlin noise and Simplex noise.
 It also contains a simple PNG encoder to write a heightmap as the output of the algorithm.
 
+Only Simplex noise is implemented right now.
+
 Running ./noise will prompt for: width, height, scale, octaves, persistence, and lacunarity. It will generate
 a PNG file with the seed of the function as its filename. If a number is passed to the program, e.g. './noise 5',
 it will use that number as the seed.
+
+Scale around 80, 3 octaves, persistence of 0.333 and lacunarity of 2.5 generates an okay height map
 
 Terms -
 
