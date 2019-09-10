@@ -32,11 +32,11 @@ using namespace Noise;
 //             data[y][x] = noise_height
 //     return normalize(data, 0, 1)
 
-NoiseGenerator::NoiseGenerator(uint64_t seed)
+NoiseGenerator::NoiseGenerator(uint64_t s) : seed(s)
 {
-	mt(seed);
+	mt = std::mt19937_64(seed);
 }
-
+/*
 std::vector<double> NoiseGenerator::generate(int x_dim, int y_dim, float scale,
   int octaves, float persistence, float lacunarity);
 {
@@ -66,8 +66,8 @@ std::vector<double> NoiseGenerator::generate(int x_dim, int y_dim, float scale,
 
   return data;
 }
-
-SimplexNoise::SimplexNoise(uint64_t seed) : NoiseGenerator(seed)
+*/
+SimplexNoise::SimplexNoise(uint64_t s) : NoiseGenerator(s)
 {
 	for (int i = 0; i < perm_table.size(); i++) {
 		perm_table[i] = rand_byte(mt);

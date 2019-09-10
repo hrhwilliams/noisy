@@ -2,7 +2,10 @@
 #define _PNG_ENCODER_HPP_
 
 #include <array>
+#include <cstdint>
 #include <fstream>
+#include <string>
+#include <vector>
 #include <zlib.h>
 
 #define DEFLATE_BUF_SZ 65536

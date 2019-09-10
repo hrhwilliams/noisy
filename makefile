@@ -1,7 +1,24 @@
-CPP := clang++
 SDIR = ./src
 IDIR = ./incl
-CPPFLAGS := -std=c++17 -lz -I$(IDIR)
+ODIR = ./obj
 
-all:
-	$(CPP) $(SDIR)/main.cpp $(SDIR)/noise.cpp $(SDIR)/encoder.cpp $(CPPFLAGS) -o Noise
+CPP = clang++
+LIBS = -lz
+CPPFLAGS := -std=c++17 -I$(IDIR)
+
+_HPP = encoder.hpp noise.hpp
+HPP = $(patsubst %,$(IDIR)/%,$(_HPP))
+
+_OBJ = encoder.o noise.o main.o
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+$(ODIR)/%.o: $(SDIR)/%.cpp
+	$(CPP) -c $< -o $@ $(CPPFLAGS)
+
+noise: $(OBJ)
+	$(CPP) -o $@ $^ $(CPPFLAGS) $(LIBS)
+
+.PHONY: clean
+
+clean:
+	rm $(ODIR)/*.o

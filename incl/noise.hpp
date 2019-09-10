@@ -9,15 +9,15 @@
 
 namespace Noise {
   class NoiseGenerator {
-  private:
+  protected:
     uint64_t seed;
     std::mt19937_64 mt;
-    std::uniform_int_distribution<uint8_t> rand_byte(0,255);
+    std::uniform_int_distribution<uint8_t> rand_byte{0,255};
   public:
-    NoiseGenerator(uint64_t seed);
-    virtual float generator(float x, float y) = 0;
-    std::vector<double> generate(int x_dim, int y_dim, float scale, int octaves,
-      float persistence, float lacunarity);
+    NoiseGenerator(uint64_t s);
+    virtual double generator(double x, double y) = 0;
+    // std::vector<double> generate(int x_dim, int y_dim, float scale, int octaves,
+    //   float persistence, float lacunarity);
   };
 
   // class PerlinNoise : public NoiseGenerator {
@@ -26,9 +26,6 @@ namespace Noise {
 
   class SimplexNoise : NoiseGenerator {
   private:
-    uint64_t seed;
-    std::mt19937_64 mt;
-    std::uniform_int_distribution<uint8_t> rand_byte(0,255);
     struct Grad {
       float x, y, z;
       Grad(float x, float y, float z) : x(x), y(y), z(z) {}
@@ -40,10 +37,10 @@ namespace Noise {
         Grad(0,1,1), Grad(0,-1,1), Grad(0,1,-1), Grad(0,-1,-1) };
     std::array<uint8_t, 512> perm_table;
     std::array<uint8_t, 512> perm_mod12;
-    static const double skewing_factor = 0.5 * (sqrt(3.0) - 1.0);
-    static const double unskewing_factor = (3.0 - sqrt(3.0)) / 6.0;
+    double skewing_factor = 0.5 * (std::sqrt(3.0) - 1.0);
+    double unskewing_factor = (3.0 - std::sqrt(3.0)) / 6.0;
   public:
-    SimplexNoise(uint64_t seed);
+    SimplexNoise(uint64_t s);
     double generator(double x, double y);
   };
 
