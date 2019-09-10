@@ -9,11 +9,15 @@ it will use that number as the seed.
 Terms -
 
 Width: width of the image in pixels
+
 Height: height of the image in pixels
+
 Scale: Scale of the noise function
 Octaves: Number of times to reapply the noise function to itself.
+
 Persistence: Factor to scale how much successive calls contribute to the overall function. Values less than
              one will have each octave contribute less and less, and values more than one will cause each
              octave to contribute more than the previous one.
+             
 Lacunarity: Factor to scale the frequency of each successive call by. Higher values mean each octave higher
             will have a smaller scale, and lower values vice-versa.
