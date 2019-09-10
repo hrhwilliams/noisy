@@ -65,6 +65,10 @@ SimplexNoise::SimplexNoise(uint64_t s) : NoiseGenerator(s)
   }
 }
 
+// 2D Simplex Noise algorithm adapted from lines 81-132 of:
+// https://github.com/SRombauts/SimplexNoise/blob/master/references/SimplexNoise.java
+// Based on example code by Stefan Gustavson (stegu@itn.liu.se) and Peter Eastman
+// (peastman@drizzle.stanford.edu).
 double SimplexNoise::generator(double x, double y)
 {
   double n0, n1, n2;
