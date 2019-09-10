@@ -11,6 +11,10 @@
 
 #define DEFLATE_BUF_SZ 65536
 
+// PNG Encoder
+//
+// Encoder that writes PNG files. Reference:
+// https://www.w3.org/TR/2003/REC-PNG-20031110/
 namespace PNG {
   enum class ColorType {
     Grayscale = 0,

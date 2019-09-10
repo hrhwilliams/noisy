@@ -8,10 +8,12 @@
 #include <random>
 #include <vector>
 
-// PNG Encoder
+// Noise Generator Classes
 //
 // NoiseGenerator is the base class for each noise generation algorithm.
-// generate returns a vector
+// generate returns a 1D vector which can be interpreted as a 2D array of
+// size x_dim * y_dim. Each derived class implements generator which is that
+// class's noise generation algorithm.
 namespace Noise {
   class NoiseGenerator {
   private:

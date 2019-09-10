@@ -8,8 +8,8 @@
 
 #include "encoder.hpp"
 
-// PNG encoder.
-
+// Hash table used for generating cyclic redundancy checks is calculated at
+// compile time
 struct crc_table {
 private:
   std::array<uint32_t, 256> arr;
@@ -57,6 +57,7 @@ uint32_t lsbtomsb(const uint32_t& val)
 }
 
 // https://zlib.net/zlib_how.html
+// i think this crashes if vec is too big at the moment
 std::vector<uint8_t> compress_vector(const std::vector<uint8_t>& vec,
   int compressionlevel = Z_BEST_COMPRESSION)
 {
@@ -109,7 +110,7 @@ PngChunk::PngChunk(std::string tc, std::vector<uint8_t> vec) : type_code(tc)
 
 PngEncoder::PngEncoder()
 {
-
+  
 }
 
 PngEncoder::~PngEncoder()
