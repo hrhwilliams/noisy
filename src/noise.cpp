@@ -8,33 +8,9 @@
 
 using namespace Noise;
 
-// std::random_device dev;
-// auto seed = dev();
-
-// def generate(self, x_dim, y_dim, scale, octaves, persistence, lacunarity):
-//     data = [[0 for _ in range(x_dim)] for _ in range(y_dim)]
-//
-//     for y in range(y_dim):
-//         for x in range(x_dim):
-//             amplitude = 1
-//             frequency = 1
-//             noise_height = 0
-//
-//             for _ in range(octaves):
-//                 sample_x = (x / scale) * frequency
-//                 sample_y = (y / scale) * frequency
-//                 noise = self._generator(sample_x, sample_y)
-//                 noise_height += noise * amplitude
-//
-//                 amplitude *= persistence
-//                 frequency *= lacunarity
-//
-//             data[y][x] = noise_height
-//     return normalize(data, 0, 1)
-
 NoiseGenerator::NoiseGenerator(uint64_t s) : seed(s)
 {
-	mt = std::mt19937_64(seed);
+  mt = std::mt19937_64(seed);
 }
 
 std::vector<double> NoiseGenerator::normalize(const std::vector<double>& data,
@@ -83,10 +59,10 @@ std::vector<double> NoiseGenerator::generate(int x_dim, int y_dim, double scale,
 
 SimplexNoise::SimplexNoise(uint64_t s) : NoiseGenerator(s)
 {
-	for (int i = 0; i < perm_table.size(); i++) {
-		perm_table[i] = rand_byte(mt);
-		perm_mod12[i] = perm_table[i] % 12;
-	}
+  for (int i = 0; i < perm_table.size(); i++) {
+    perm_table[i] = rand_byte(mt);
+    perm_mod12[i] = perm_table[i] % 12;
+  }
 }
 
 double SimplexNoise::generator(double x, double y)
