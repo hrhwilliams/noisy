@@ -25,3 +25,7 @@ Persistence: Factor to scale how much successive calls contribute to the overall
              
 Lacunarity: Factor to scale the frequency of each successive call by. Higher values mean each octave higher
             will have a smaller scale, and lower values vice-versa.
+
+### Examples
+
+![](out/13965777268663052238.png)
