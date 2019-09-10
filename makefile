@@ -2,7 +2,7 @@ SDIR = ./src
 IDIR = ./incl
 ODIR = ./obj
 
-CPP = clang++
+CPP = g++
 LIBS = -lz
 CPPFLAGS := -std=c++17 -I$(IDIR)
 

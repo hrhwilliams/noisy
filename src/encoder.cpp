@@ -1,11 +1,14 @@
 #include <array>
 #include <cstdint>
+#include <cstring>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <zlib.h>
 
 #include "encoder.hpp"
+
+// PNG encoder.
 
 struct crc_table {
 private:

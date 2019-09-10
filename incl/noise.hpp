@@ -1,12 +1,17 @@
 #ifndef __NOISE_NOISE_HPP_
 #define __NOISE_NOISE_HPP_
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <iostream>
 #include <random>
 #include <vector>
 
+// PNG Encoder
+//
+// NoiseGenerator is the base class for each noise generation algorithm.
+// generate returns a vector
 namespace Noise {
   class NoiseGenerator {
   private:
