@@ -19,16 +19,20 @@ std::vector<uint8_t> convert_vec(const std::vector<double>& data)
   return bytes;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
   std::random_device rd;
   std::stringstream seed_str;
   uint64_t seed;
 
-  // Generate a 64-bit seed
-  seed = rd();
-  seed <<= 32;
-  seed += rd();
+  if (argc < 2) {
+    // Generate a 64-bit seed
+    seed = rd();
+    seed <<= 32;
+    seed += rd();
+  } else {
+    seed = std::atoi(argv[1]);
+  }
   seed_str << seed << ".png";
 
   auto noise = Noise::SimplexNoise(seed);
