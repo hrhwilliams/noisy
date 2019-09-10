@@ -16,21 +16,21 @@ namespace Noise {
   public:
     NoiseGenerator(uint64_t s);
     virtual double generator(double x, double y) = 0;
-    // std::vector<double> generate(int x_dim, int y_dim, float scale, int octaves,
-    //   float persistence, float lacunarity);
+    std::vector<double> generate(int x_dim, int y_dim, double scale, int octaves,
+      double persistence, double lacunarity);
   };
 
   // class PerlinNoise : public NoiseGenerator {
   //
   // };
 
-  class SimplexNoise : NoiseGenerator {
+  class SimplexNoise : public NoiseGenerator {
   private:
     struct Grad {
-      float x, y, z;
-      Grad(float x, float y, float z) : x(x), y(y), z(z) {}
+      double x, y, z;
+      Grad(double x, double y, double z) : x(x), y(y), z(z) {}
     };
-    float dot(Grad g1, Grad g2) { return g1.x * g2.x + g1.y * g2.y + g1.z * g2.z; }
+    double dot(Grad g1, Grad g2) { return g1.x * g2.x + g1.y * g2.y + g1.z * g2.z; }
     const std::array<Grad, 12> gradients =
       { Grad(1,1,0), Grad(-1,1,0), Grad(1,-1,0), Grad(-1,-1,0),
         Grad(1,0,1), Grad(-1,0,1), Grad(1,0,-1), Grad(-1,0,-1),

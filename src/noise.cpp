@@ -36,9 +36,9 @@ NoiseGenerator::NoiseGenerator(uint64_t s) : seed(s)
 {
 	mt = std::mt19937_64(seed);
 }
-/*
-std::vector<double> NoiseGenerator::generate(int x_dim, int y_dim, float scale,
-  int octaves, float persistence, float lacunarity);
+
+std::vector<double> NoiseGenerator::generate(int x_dim, int y_dim, double scale,
+  int octaves, double persistence, double lacunarity)
 {
   std::vector<double> data;
   double amplitude = 1.0;
@@ -47,15 +47,15 @@ std::vector<double> NoiseGenerator::generate(int x_dim, int y_dim, float scale,
 
   for (int y = 0; y < y_dim; y++) {
     for (int x = 0; x < x_dim; x++) {
-      amplitude = 1.0;
-      frequency = 1.0;
-      noise_height = 0.0;
+      double amplitude = 1.0;
+      double frequency = 1.0;
+      double noise_height = 0.0;
 
       for (int i = 0; i < octaves; i++) {
-        sample_x = (x / scale) * frequency;
-        sample_y = (y / scale) * frequency;
-        noise = this->generator(sample_x, sample_y);
-        noise_height += noise * amplitude
+        double sample_x = (x / scale) * frequency;
+        double sample_y = (y / scale) * frequency;
+        double noise = this->generator(sample_x, sample_y);
+        noise_height += noise * amplitude;
 
         amplitude *= persistence;
         frequency *= lacunarity;
@@ -66,7 +66,7 @@ std::vector<double> NoiseGenerator::generate(int x_dim, int y_dim, float scale,
 
   return data;
 }
-*/
+
 SimplexNoise::SimplexNoise(uint64_t s) : NoiseGenerator(s)
 {
 	for (int i = 0; i < perm_table.size(); i++) {
