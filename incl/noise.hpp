@@ -9,6 +9,9 @@
 
 namespace Noise {
   class NoiseGenerator {
+  private:
+    std::vector<double> normalize(const std::vector<double>& data, double a,
+      double b);
   protected:
     uint64_t seed;
     std::mt19937_64 mt;

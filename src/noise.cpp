@@ -37,6 +37,20 @@ NoiseGenerator::NoiseGenerator(uint64_t s) : seed(s)
 	mt = std::mt19937_64(seed);
 }
 
+std::vector<double> NoiseGenerator::normalize(const std::vector<double>& data,
+  double a, double b)
+{
+  std::vector<double> normalized;
+  double min = *std::min_element(data.begin(), data.end());
+  double max = *std::max_element(data.begin(), data.end());
+
+  for (auto&& x : data) {
+    normalized.push_back(a + ((x - min) * (b - a)) / (max - min));
+  }
+
+  return normalized;
+}
+
 std::vector<double> NoiseGenerator::generate(int x_dim, int y_dim, double scale,
   int octaves, double persistence, double lacunarity)
 {
@@ -64,7 +78,7 @@ std::vector<double> NoiseGenerator::generate(int x_dim, int y_dim, double scale,
     }
   }
 
-  return data;
+  return normalize(data, 0.0, 1.0);
 }
 
 SimplexNoise::SimplexNoise(uint64_t s) : NoiseGenerator(s)
@@ -125,7 +139,6 @@ double SimplexNoise::generator(double x, double y)
     t2 *= t2;
     n2 = t2 * t2 * dot(gradients[gi2], Grad(x2, y2, 0));
   }
-  // Add contributions from each corner to get the final noise value.
-  // The result is scaled to return values in the interval [-1,1].
-  return 70.0 * (n0 + n1 + n2);
+
+  return (n0 + n1 + n2);
 }
