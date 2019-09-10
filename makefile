@@ -13,6 +13,7 @@ _OBJ = encoder.o noise.o main.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(SDIR)/%.cpp
+	@mkdir -p $(@D)
 	$(CPP) -c $< -o $@ $(CPPFLAGS)
 
 noise: $(OBJ)
