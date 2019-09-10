@@ -1,6 +1,9 @@
-#include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <sstream>
 
 #include "encoder.hpp"
 #include "noise.hpp"
@@ -18,14 +21,45 @@ std::vector<uint8_t> convert_vec(const std::vector<double>& data)
 
 int main()
 {
-  auto noise = Noise::SimplexNoise(5);
-  auto encoder = PNG::PngEncoder();
-  auto image = noise.generate(256, 256, 100, 4, 0.333, 2.5);
+  std::random_device rd;
+  std::stringstream seed_str;
+  uint64_t seed;
 
-  encoder.open("noise.png");
-  encoder.write_ihdr(256, 256, 8, PNG::ColorType::Grayscale);
+  // Generate a 64-bit seed
+  seed = rd();
+  seed <<= 32;
+  seed += rd();
+  seed_str << seed << ".png";
+
+  auto noise = Noise::SimplexNoise(seed);
+  auto encoder = PNG::PngEncoder();
+
+  int x_dim, y_dim, octaves;
+  double scale, persistence, lacunarity;
+
+  std::cout << "Image width: ";
+  std::cin >> x_dim;
+  std::cout << "Image height: ";
+  std::cin >> y_dim;
+  std::cout << "Scale: ";
+  std::cin >> scale;
+  std::cout << "Octaves: ";
+  std::cin >> octaves;
+  std::cout << "Persistence: ";
+  std::cin >> persistence;
+  std::cout << "Lacunarity: ";
+  std::cin >> lacunarity;
+
+  auto image = noise.generate(x_dim, y_dim, scale, octaves, persistence,
+    lacunarity);
+
+  encoder.open(seed_str.str());
+  encoder.write_ihdr(x_dim, y_dim, 8, PNG::ColorType::Grayscale);
   encoder.write_idat(convert_vec(image));
   encoder.write_iend();
   encoder.close();
+
+  std::cout << "Wrote out " << seed_str.str() << std::endl;
+
   return 0;
 }
