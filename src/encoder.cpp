@@ -21,10 +21,7 @@ public:
       uint32_t c = (uint32_t) n;
       for (int k = 0; k < 8; k++)
       {
-        if (c & 1)
-          c = 0xEDB88320L ^ (c >> 1);
-        else
-          c >>= 1;
+        c = (c & 1) ? (0xEDB88320L ^ (c >> 1)) : (c >> 1);
       }
       arr[n] = c;
     }
