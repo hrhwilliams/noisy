@@ -4,7 +4,7 @@ ODIR = ./obj
 
 CPP = g++
 LIBS = -lz
-CPPFLAGS := -std=c++17 -I$(IDIR)
+CPPFLAGS := -std=c++17 -I$(IDIR) -g
 
 _HPP = encoder.hpp noise.hpp
 HPP = $(patsubst %,$(IDIR)/%,$(_HPP))
