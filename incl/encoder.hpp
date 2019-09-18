@@ -60,4 +60,14 @@ namespace PNG {
   };
 };
 
+template <typename T>
+T swap_endianness(const T& x)
+{
+    uint8_t *byte = (uint8_t*)&x + sizeof(T);
+    uint8_t byte_array[sizeof(T)];
+    for (std::size_t i = 0; i < sizeof(T); i++)
+        byte_array[i] = *(--byte);
+    return *reinterpret_cast<T*>(byte_array);
+}
+
 #endif // _PNG_ENCODER_HPP_

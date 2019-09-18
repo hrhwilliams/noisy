@@ -45,12 +45,6 @@ uint32_t create_crc(const std::vector<uint8_t> &buf)
     return update_crc(0xFFFFFFFFL, buf) ^ 0xFFFFFFFFL;
 }
 
-uint32_t lsbtomsb(const uint32_t& val)
-{
-    return ((val >> 24) & 0xFF) | ((val >> 8) & 0xFF00) | ((val << 8) & 0xFF0000)
-    | ((val << 24) & 0xFF000000);
-}
-
 // https://zlib.net/zlib_how.html
 // i think this crashes if vec is too big at the moment
 std::vector<uint8_t> compress_vector(const std::vector<uint8_t>& vec,
@@ -92,7 +86,7 @@ using namespace PNG;
 PngChunk::PngChunk(std::string tc, std::vector<uint8_t> vec) : type_code(tc)
 {
     length = vec.size();
-    uint32_t msb_len = lsbtomsb(length);
+    uint32_t msb_len = swap_endianness(length);
     std::copy((uint8_t*)&msb_len, (uint8_t*)&msb_len + sizeof(msb_len), std::back_inserter(data));
     std::copy(tc.begin(), tc.end(), std::back_inserter(data));
     std::copy(vec.begin(), vec.end(), std::back_inserter(data));
@@ -101,7 +95,7 @@ PngChunk::PngChunk(std::string tc, std::vector<uint8_t> vec) : type_code(tc)
     std::copy(data.begin() + 4, data.end(), std::back_inserter(crc_data));
 
     crc = create_crc(crc_data);
-    uint32_t msb_crc = lsbtomsb(crc);
+    uint32_t msb_crc = swap_endianness(crc);
 
     std::copy((uint8_t*)&msb_crc, (uint8_t*)&msb_crc + sizeof(msb_crc), std::back_inserter(data));
 }
@@ -164,8 +158,8 @@ void PngEncoder::write_ihdr(uint32_t width, uint32_t height, uint8_t bitd,
     img_width = width;
     img_height = height;
     bit_depth = bitd;
-    uint32_t msb_width = lsbtomsb(width);
-    uint32_t msb_height = lsbtomsb(height);
+    uint32_t msb_width = swap_endianness(width);
+    uint32_t msb_height = swap_endianness(height);
     std::copy((uint8_t*)&msb_width, (uint8_t*)&msb_width + sizeof(msb_width),
         std::back_inserter(data));
     std::copy((uint8_t*)&msb_height, (uint8_t*)&msb_height + sizeof(msb_height),
