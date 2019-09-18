@@ -29,5 +29,6 @@ Lacunarity: Factor to scale the frequency of each successive call by. Higher val
 ### Examples
 width: 256, height: 256, scale: 60, octaves: 3, persistence: 0.15, lacunarity: 2
 
-![](out/13965777268663052238.png)
+![](examples/noise.png)
+
 (wow!)
