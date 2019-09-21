@@ -8,7 +8,7 @@
 #include "encoder.hpp"
 #include "noise.hpp"
 
-std::vector<uint8_t> convert_vec(const std::vector<double>& data)
+std::vector<uint8_t> convert_vec(const std::vector<float>& data)
 {
   std::vector<uint8_t> bytes;
 
@@ -31,15 +31,15 @@ int main(int argc, char *argv[])
     seed <<= 32;
     seed += rd();
   } else {
-    seed = std::atoi(argv[1]);
+    seed = std::atol(argv[1]);
   }
   seed_str << seed << ".png";
 
-  auto noise = Noise::PerlinNoise(seed);
+  auto noise = Noise::SimplexNoise(seed);
   auto encoder = PNG::PngEncoder();
 
   int x_dim, y_dim, octaves;
-  double scale, persistence, lacunarity;
+  float scale, persistence, lacunarity;
 
   std::cout << "Image width: ";
   std::cin >> x_dim;

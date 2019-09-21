@@ -31,13 +31,13 @@ namespace Noise {
         uint64_t seed;
         std::mt19937_64 mt;
         std::uniform_int_distribution<uint8_t> rand_byte{0,255};
-        std::vector<double> normalize(const std::vector<double>& data, double a,
-            double b);
+        std::vector<float> normalize(const std::vector<float>& data, float a,
+            float b);
     public:
         NoiseGenerator(uint64_t s);
-        virtual double generator(double x, double y) = 0;
-        std::vector<double> generate(int x_dim, int y_dim, double scale, int octaves,
-            double persistence, double lacunarity);
+        virtual float generator(float x, float y) = 0;
+        std::vector<float> generate(int x_dim, int y_dim, float scale, int octaves,
+            float persistence, float lacunarity);
     };
 
     class PerlinNoise : public NoiseGenerator {
@@ -52,23 +52,23 @@ namespace Noise {
         std::array<Grad, 32> points;
     public:
         PerlinNoise(uint64_t s);
-        double generator(double x, double y);
+        float generator(float x, float y);
     };
 
     class SimplexNoise : public NoiseGenerator {
     private:
-        double dot(Grad g1, Grad g2) { return g1.x * g2.x + g1.y * g2.y + g1.z * g2.z; }
+        float dot(Grad g1, Grad g2) { return g1.x * g2.x + g1.y * g2.y + g1.z * g2.z; }
         const std::array<Grad, 12> gradients =
         { Grad(1,1,0), Grad(-1,1,0), Grad(1,-1,0), Grad(-1,-1,0),
           Grad(1,0,1), Grad(-1,0,1), Grad(1,0,-1), Grad(-1,0,-1),
           Grad(0,1,1), Grad(0,-1,1), Grad(0,1,-1), Grad(0,-1,-1) };
         std::array<uint8_t, 512> perm_table;
         std::array<uint8_t, 512> perm_mod12;
-        double skewing_factor = 0.5 * (std::sqrt(3.0) - 1.0);
-        double unskewing_factor = (3.0 - std::sqrt(3.0)) / 6.0;
+        float skewing_factor = 0.5 * (std::sqrt(3.0) - 1.0);
+        float unskewing_factor = (3.0 - std::sqrt(3.0)) / 6.0;
     public:
         SimplexNoise(uint64_t s);
-        double generator(double x, double y);
+        float generator(float x, float y);
     };
 
   // class OpenSimplexNoise : public NoiseGenerator {
