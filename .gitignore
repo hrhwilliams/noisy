@@ -1,6 +1,6 @@
+noise
 .DS_Store
 out/
 obj/
 ./*.png
 *.o
-noise
