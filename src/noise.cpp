@@ -9,6 +9,11 @@
 
 using namespace Noise;
 
+double lerp(double t, double x, double y)
+{
+    return x + t * (y - x);
+}
+
 NoiseGenerator::NoiseGenerator(uint64_t s) : seed(s)
 {
   mt = std::mt19937_64(seed);
@@ -58,12 +63,165 @@ std::vector<double> NoiseGenerator::generate(int x_dim, int y_dim, double scale,
   return normalize(data, 0.0, 1.0);
 }
 
+// NoiseGenerator::generate_2d_array()
+
+// ----- //
+
+// B = 256
+// M = 256 - 1 = 255
+// N = 256
+// NM = 256 - 1 = 255
+// p = new int[B + B + 2]
+// g2 = new double[B + B + 2][2]
+// g1 = new double[B + B + 2]
+// start = 1
+// points = new double[32][3]
+
+Grad PerlinNoise::normalize2(const Grad &g)
+{
+    float norm = std::sqrt(g.x * g.x + g.y * g.y + g.z * g.z);
+    return Grad(g.x / norm, g.y / norm, g.z / norm);
+}
+
+float PerlinNoise::s_curve(const float& t)
+{
+    return t * t * (3 - t - t);
+}
+
+PerlinNoise::PerlinNoise(uint64_t s) : NoiseGenerator(s)
+{
+    int i, j, k;
+    float u, v, w, U, V, W, Hi, Lo;
+    for (i = 0; i < 256; i++)
+    {
+        p[i] = i;
+        g1[i] = rand_float(mt);
+
+        do
+        {
+            u = rand_float(mt);
+            v = rand_float(mt);
+        }
+        while (u * u + v * v > 1 || std::abs(u) > 2.5 * std::abs(v)
+            || std::abs(v) > 2.5 * std::abs(u)
+            || std::abs(std::abs(u) - std::abs(v)) < .4);
+        g2[i] = normalize2(Grad(u, v, 0));
+
+        do
+        {
+            u = rand_float(mt);
+            v = rand_float(mt);
+            w = rand_float(mt);
+            U = std::abs(u);
+            V = std::abs(v);
+            W = std::abs(w);
+            Lo = std::min(U, std::min(V, W));
+            Hi = std::max(U, std::max(V, W));
+        }
+        while (u * u + v * v + w * w > 1 || Hi > 4 * Lo
+            || std::min(std::abs(U - V), std::min(std::abs(U - W), std::abs(V - W))) < .2);
+    }
+
+    while (--i > 0)
+    {
+        k = p[i];
+        j = (int) (rand_byte(mt) & 255);
+        p[i] = p[j];
+        p[j] = k;
+    }
+    for (i = 0; i < 256 + 2; i++)
+    {
+        p[256 + i] = p[i];
+        g1[256 + i] = g1[i];
+        for (j = 0; j < 2; j++)
+        {
+            g2[256 + i] = g2[i];
+        }
+    }
+
+    points[3] = Grad(std::sqrt(1.0f / 3.0f), std::sqrt(1.0f / 3.0f), std::sqrt(1.0f / 3.0f));
+    float r2 = std::sqrt(1.0f / 2.0f);
+    float sqr = std::sqrt(2.0f + r2 + r2);
+
+    for (i = 0; i < 3; i++)
+    {
+        for (j = 0; j < 3; j++)
+        {
+            points[i][j] = (i == j ? 1 + r2 + r2 : r2) / sqr;
+        }
+    }
+    for (i = 0; i <= 1; i++)
+    {
+        for (j = 0; j <= 1; j++)
+        {
+            for (k = 0; k <= 1; k++)
+            {
+                int n = i + j * 2 + k * 4;
+                if (n > 0)
+                for (int m = 0; m < 4; m++)
+                {
+                    points[4 * n + m] = Grad((i == 0 ? 1 : -1) * points[m].x,
+                        (j == 0 ? 1 : -1) * points[m].y, (k == 0 ? 1 : -1) * points[m].z);
+                }
+            }
+        }
+    }
+}
+
+double PerlinNoise::generator(double x, double y)
+{
+    int bx0, bx1, by0, by1, b00, b10, b01, b11;
+    double rx0, rx1, ry0, ry1, sx, sy, a, b, t, u, v;
+    Grad q;
+    int i, j;
+
+    t = x + 256;
+    bx0 = ((int) t) & 255;
+    bx1 = (bx0 + 1) & 255;
+    rx0 = t - (int) t;
+    rx1 = rx0 - 1;
+
+    t = y + 256;
+    by0 = ((int) t) & 255;
+    by1 = (by0 + 1) & 255;
+    ry0 = t - (int) t;
+    ry1 = ry0 - 1;
+
+    i = p[bx0];
+    j = p[bx1];
+
+    b00 = p[i + by0];
+    b10 = p[j + by0];
+    b01 = p[i + by1];
+    b11 = p[j + by1];
+
+    sx = s_curve(rx0);
+    sy = s_curve(ry0);
+
+    q = g2[b00];
+    u = rx0 * q.x + ry0 * q.y;
+    q = g2[b10];
+    v = rx1 * q.x + ry0 * q.y;
+    a = lerp(sx, u, v);
+
+    q = g2[b01];
+    u = rx0 * q.x + ry1 * q.y;
+    q = g2[b11];
+    v = rx1 * q.x + ry1 * q.y;
+    b = lerp(sx, u, v);
+
+    return lerp(sy, a, b);
+}
+
+// ----- //
+
 SimplexNoise::SimplexNoise(uint64_t s) : NoiseGenerator(s)
 {
-  for (int i = 0; i < perm_table.size(); i++) {
-    perm_table[i] = rand_byte(mt);
-    perm_mod12[i] = perm_table[i] % 12;
-  }
+    for (int i = 0; i < perm_table.size(); i++)
+    {
+        perm_table[i] = rand_byte(mt);
+        perm_mod12[i] = perm_table[i] % 12;
+    }
 }
 
 // 2D Simplex Noise algorithm adapted from lines 81-132 of:

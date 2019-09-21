@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
   }
   seed_str << seed << ".png";
 
-  auto noise = Noise::SimplexNoise(seed);
+  auto noise = Noise::PerlinNoise(seed);
   auto encoder = PNG::PngEncoder();
 
   int x_dim, y_dim, octaves;

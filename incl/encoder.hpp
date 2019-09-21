@@ -54,7 +54,7 @@ namespace PNG {
     void operator<<(PngChunk& chunk);
 
     void write_ihdr(uint32_t width, uint32_t height, uint8_t bit_depth,
-      ColorType color_type);
+        ColorType color_type);
     void write_idat(const std::vector<uint8_t>& data);
     void write_iend();
   };
