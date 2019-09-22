@@ -64,8 +64,8 @@ namespace Noise {
           Grad(0,1,1), Grad(0,-1,1), Grad(0,1,-1), Grad(0,-1,-1) };
         std::array<uint8_t, 512> perm_table;
         std::array<uint8_t, 512> perm_mod12;
-        float skewing_factor = 0.5 * (std::sqrt(3.0) - 1.0);
-        float unskewing_factor = (3.0 - std::sqrt(3.0)) / 6.0;
+        const float skewing_factor = 0.5 * (std::sqrt(3.0) - 1.0);
+        const float unskewing_factor = (3.0 - std::sqrt(3.0)) / 6.0;
     public:
         SimplexNoise(uint64_t s);
         float generator(float x, float y);
