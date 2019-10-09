@@ -74,6 +74,17 @@ namespace Noise {
   // class OpenSimplexNoise : public NoiseGenerator {
   //
   // };
+
+  class NoiseMap {
+  private:
+      std::size_t length;
+      std::size_t width;
+      std::vector<float> noise_map;
+  public:
+      NoiseMap(std::size_t length, std::size_t width);
+      void generate(NoiseGenerator *gen, float scale, int octaves, float persistence,
+          float lacunarity);
+  };
 };
 
 #endif // __NOISE_NOISE_HPP_

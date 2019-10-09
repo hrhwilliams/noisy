@@ -8,79 +8,83 @@
 
 #include "encoder.hpp"
 
-// Hash table used for generating cyclic redundancy checks is calculated at
-// compile time
+// --------------------------- Utility Functions --------------------------- //
+// crc_table stores the CRC code for every value of an 8-bit number into a table at compile time
+// using constexpr. The table is used when calculating the CRC of a PNG chunk as to avoid
+// recalculating the CRC code for each byte thousands of times.
 struct crc_table {
 private:
-    std::array<uint32_t, 256> arr;
+    uint32_t polynomial = 0xEDB88320L; // magic number which yields the results of
+    uint32_t tableLength = 256;        // polynomial division when XOR'd
+    std::array<uint32_t, 256> tableArray;
 public:
-    constexpr crc_table() : arr()
-    {
-        for (int n = 0; n < 256; n++) {
-            uint32_t c = (uint32_t) n;
-            for (int k = 0; k < 8; k++) {
-                c = (c & 1) ? (0xEDB88320L ^ (c >> 1)) : (c >> 1);
+    constexpr crc_table() : tableArray() {
+        for (uint32_t i = 0; i < tableLength; i++) {
+            uint32_t coefficient = i;
+            for (int j = 0; j < 8; j++) {
+                coefficient = (coefficient & 1) ? (polynomial ^ (coefficient >> 1)) : (coefficient >> 1);
             }
-            arr[n] = c;
+            tableArray[i] = coefficient;
         }
     }
-    const uint32_t &operator[](std::size_t i) const { return arr[i]; }
+    const uint32_t &operator[](std::size_t ind) const { return tableArray[ind]; }
 };
 
-constexpr auto crctable = crc_table();
+constexpr auto crcTable = crc_table();
 
-uint32_t update_crc(uint32_t crc, const std::vector<uint8_t> &buf)
+uint32_t update_crc(uint32_t crcCode, const std::vector<uint8_t> &vectorBytes)
 {
-    uint32_t c = crc;
-
-    for (int n = 0; n < buf.size(); n++) {
-        c = crctable[(c ^ buf[n]) & 0xff] ^ (c >> 8);
+    for (int i = 0; i < buffer.size(); i++) {
+        crcCode = crcTable[(crcCode ^ vectorBytes[i]) & 0xFF] ^ (crcCode >> 8);
     }
 
-    return c;
+    return crcCode;
 }
 
-uint32_t create_crc(const std::vector<uint8_t> &buf)
+uint32_t create_crc(const std::vector<uint8_t> &vectorBytes)
 {
-    return update_crc(0xFFFFFFFFL, buf) ^ 0xFFFFFFFFL;
+    uint32_t startingValue = 0xFFFFFFFF;
+    return update_crc(startingValue, vectorBytes) ^ startingValue;
 }
 
-// https://zlib.net/zlib_how.html
-// i think this crashes if vec is too big at the moment
-std::vector<uint8_t> compress_vector(const std::vector<uint8_t>& vec,
-    int compressionlevel = Z_BEST_COMPRESSION)
+// Reference: https://zlib.net/zlib_how.html
+std::vector<uint8_t> compress_vector(const std::vector<uint8_t>& vectorBytes,
+    int compressionLevel = Z_BEST_COMPRESSION)
 {
-    z_stream zs;
-    memset(&zs, 0, sizeof(zs));
+    using zLibBytePtr = Bytef*;
+    z_stream zLibStream;
+    std::memset(&zLibStream, 0, sizeof(zLibStream));
 
-    if (deflateInit(&zs, compressionlevel) != Z_OK)
+    if (deflateInit(&zLibStream, compressionLevel) != Z_OK)
         throw(std::runtime_error("deflateInit failed while compressing."));
 
-    int ret;
-    uint32_t prev_out = 0;
-    std::array<uint8_t, DEFLATE_BUF_SZ> buf;
-    std::vector<uint8_t> out;
+    int retValue;
+    uint32_t prevOutputLength = 0;
+    std::array<uint8_t, DEFLATE_BUF_SZ> buffer;
+    std::vector<uint8_t> deflatedBuffer;
 
-    zs.next_in = (Bytef*)vec.data();
-    zs.avail_in = vec.size();
-    // zs.next_out = (Bytef*)buf.data();
-    // zs.avail_out = buf.size();
+    zLibStream.next_in = (zLibBytePtr)(vectorBytes.data());
+    zLibStream.avail_in = vectorBytes.size();
 
     do {
-        zs.next_out = (Bytef*)(buf.data());
-        zs.avail_out = buf.size();
+        zLibStream.next_out = (zLibBytePtr)(buffer.data());
+        zLibStream.avail_out = buffer.size();
 
-        ret = deflate(&zs, Z_FINISH);
-        prev_out = zs.total_out - prev_out;
+        retValue = deflate(&zLibStream, Z_FINISH);
+        prevOutputLength = zLibStream.total_out - prevOutputLength;
 
-        std::copy(buf.begin(), buf.begin() + prev_out, std::back_inserter(out));
-        prev_out = zs.total_out;
-    } while (ret == Z_OK);
-    deflateEnd(&zs);
-    return out;
+        std::copy(buffer.begin(), buffer.begin() + prevOutputLength,
+            std::back_inserter(deflatedBuffer));
+        prevOutputLength = zLibStream.total_out;
+    } while (retValue == Z_OK);
+
+    deflateEnd(&zLibStream);
+    return deflatedBuffer;
 }
 
-// ------------------------------ //
+// --------------------------- Utility Functions --------------------------- //
+
+// --------------------------- Class Definitions --------------------------- //
 using namespace PNG;
 
 PngChunk::PngChunk(std::string tc, std::vector<uint8_t> vec) : type_code(tc)

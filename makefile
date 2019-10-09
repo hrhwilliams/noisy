@@ -6,10 +6,10 @@ CPP = g++
 LIBS = -lz
 CPPFLAGS := -std=c++17 -I$(IDIR) -g
 
-_HPP = encoder.hpp noise.hpp
+_HPP = encoder.hpp noise.hpp mask.hpp
 HPP = $(patsubst %,$(IDIR)/%,$(_HPP))
 
-_OBJ = encoder.o noise.o main.o
+_OBJ = encoder.o noise.o mask.o noise_functions.o main.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: $(SDIR)/%.cpp

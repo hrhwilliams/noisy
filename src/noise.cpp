@@ -78,6 +78,8 @@ float PerlinNoise::s_curve(const float& t)
     return t * t * (3 - t - t);
 }
 
+// 2D Perlin Noise adapted from
+// https://mrl.nyu.edu/~perlin/experiments/packing/render/Noise.java
 PerlinNoise::PerlinNoise(uint64_t s) : NoiseGenerator(s)
 {
     int i, j, k;
@@ -259,4 +261,15 @@ float SimplexNoise::generator(float x, float y)
     }
 
     return (n0 + n1 + n2);
+}
+
+NoiseMap::NoiseMap(std::size_t length, std::size_t width) : length(length), width(width)
+{
+
+}
+
+void NoiseMap::generate(NoiseGenerator *gen, float scale, int octaves, float persistence,
+    float lacunarity)
+{
+    noise_map = gen->generate(length, width, scale, octaves, persistence, lacunarity);
 }
